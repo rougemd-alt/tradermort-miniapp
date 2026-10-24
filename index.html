@@ -165,35 +165,85 @@
             text-align: center;
         }
 
-        .features {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+        .wallets-panel {
+            margin-top: 30px;
+        }
+
+        .panel-heading {
+            display: flex;
+            align-items: center;
             gap: 12px;
-            margin-top: 16px;
+            margin-bottom: 17px;
         }
 
-        .feature {
-            padding: 17px 15px;
-            border: 1px solid #202C37;
-            border-radius: 16px;
-            background: rgba(18, 27, 36, 0.7);
+        .panel-heading-icon {
+            width: 43px;
+            height: 43px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: #163A2A;
+            color: #4ADE80;
+            font-size: 25px;
         }
 
-        .feature-icon {
-            margin-bottom: 11px;
-            font-size: 20px;
+        .panel-heading-text {
+            flex: 1;
         }
 
-        .feature-title {
-            font-size: 13px;
-            font-weight: 700;
+        .panel-heading-text h2 {
+            margin: 0;
+            color: #F8FAFC;
+            font-size: 18px;
         }
 
-        .feature-text {
-            margin-top: 6px;
+        .panel-heading-text p {
+            margin: 5px 0 0;
             color: #94A3B8;
-            font-size: 11px;
+            font-size: 12px;
             line-height: 1.5;
+        }
+
+        .wallet-count {
+            padding: 6px 9px;
+            border: 1px solid #263644;
+            border-radius: 9px;
+            color: #94A3B8;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .empty-wallets {
+            padding: 28px 20px;
+            border: 1px solid #263644;
+            border-radius: 20px;
+            background: rgba(18, 27, 36, 0.75);
+            text-align: center;
+        }
+
+        .empty-wallet-icon {
+            width: 60px;
+            height: 60px;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            background: #17251F;
+            color: #4ADE80;
+            font-size: 32px;
+        }
+
+        .empty-wallets h3 {
+            margin: 0 0 10px;
+            color: #F8FAFC;
+            font-size: 16px;
+        }
+
+        .empty-wallets p {
+            margin: 0;
+            color: #94A3B8;
+            font-size: 13px;
+            line-height: 1.7;
         }
 
         footer {
@@ -220,7 +270,7 @@
         </header>
 
         <section>
-            <div class="eyebrow">Your wallet starts here</div>
+            <div class="eyebrow">YOUR WALLET STARTS HERE</div>
             <h1>Твой криптомир.<br>В одном месте.</h1>
             <p class="description">
                 Подключи свой криптокошелёк,
@@ -251,20 +301,25 @@
             </p>
         </section>
 
-        <section class="features">
-            <div class="feature">
-                <div class="feature-icon">⌑</div>
-                <div class="feature-title">Твой контроль</div>
-                <div class="feature-text">
-                    Сам проверяешь разрешения кошелька.
+        <section class="wallets-panel">
+            <div class="panel-heading">
+                <div class="panel-heading-icon">◈</div>
+                <div class="panel-heading-text">
+                    <h2>Мои кошельки</h2>
+                    <p>Управляй подключёнными кошельками в панели</p>
                 </div>
+                <span class="wallet-count" id="walletCount">0</span>
             </div>
 
-            <div class="feature">
-                <div class="feature-icon">ϟ</div>
-                <div class="feature-title">Быстрый доступ</div>
-                <div class="feature-text">
-                    Удобный интерфейс внутри Telegram.
+            <div id="walletList">
+                <div class="empty-wallets" id="emptyWallets">
+                    <div class="empty-wallet-icon">◇</div>
+                    <h3>Пока нет подключённых кошельков</h3>
+                    <p>
+                        Подключи первый кошелёк — он появится здесь.
+                        Ты сможешь переименовывать и удалять кошельки
+                        прямо из этой панели.
+                    </p>
                 </div>
             </div>
         </section>
@@ -284,4 +339,5 @@
     </script>
 </body>
 </html>
+
 
