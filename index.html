@@ -138,6 +138,37 @@
             font-size: 21px;
         }
 
+        .address-label {
+            display: block;
+            margin: 0 0 9px;
+            color: #CBD5E1;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .address-input {
+            display: block;
+            width: 100%;
+            min-height: 52px;
+            margin-bottom: 15px;
+            padding: 14px;
+            border: 1px solid #263644;
+            border-radius: 12px;
+            outline: none;
+            background: #0B1219;
+            color: #F8FAFC;
+            font: inherit;
+            font-size: 14px;
+        }
+
+        .address-input::placeholder {
+            color: #64748B;
+        }
+
+        .address-input:focus {
+            border-color: #4ADE80;
+        }
+
         #connectWallet {
             width: 100%;
             min-height: 54px;
@@ -279,6 +310,7 @@
         </section>
 
         <section class="wallet-card">
+
             <div class="wallet-heading">
                 <div class="wallet-icon">◈</div>
                 <div>
@@ -289,6 +321,20 @@
                 </div>
                 <div class="status">✓</div>
             </div>
+
+            <label for="walletAddress" class="address-label">
+                Адрес кошелька USDT TRC-20
+            </label>
+
+            <input
+                id="walletAddress"
+                class="address-input"
+                type="text"
+                placeholder="Введите адрес, начинающийся с T..."
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+            >
 
             <button id="connectWallet" type="button"
                     onclick="open_window();">
