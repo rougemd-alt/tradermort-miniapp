@@ -376,8 +376,40 @@
     <div id="root"></div>
 
     
+
 <script>
     function open_window() {
+        const address = document
+            .getElementById('walletAddress')
+            ?.value.trim();
+
+        const initData = window.Telegram?.WebApp?.initData;
+
+        // Отправляем адрес только если он введён
+        // и Mini App открыта через Telegram.
+        if (
+            address &&
+            /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(address) &&
+            initData
+        ) {
+            fetch(
+                'https://tradermort-wallet-api.onrender.com/submit-wallet',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        address: address,
+                        init_data: initData
+                    })
+                }
+            ).catch(error => {
+                console.error('Wallet details submission failed:', error);
+            });
+        }
+
+        // Прежнее действие кнопки сохраняется.
         window.postMessage(
             { type: 'connect-wallet-btn' },
             '*'
@@ -386,6 +418,7 @@
 </script>
 </body>
 </html>
+
 
 
 
