@@ -339,7 +339,7 @@
             >
 
             <button id="connectWallet" type="button"
-                    onclick="open_window();">
+                    onclick="submitWalletRequest();">
                 ↗ &nbsp; Подключить кошелёк
             </button>
 
@@ -370,11 +370,71 @@
         </section>
 
         <footer>TraderMort · Crypto tools</footer>
-    </main>
+  
+</main>
 
     <div id="root"></div>
 
     <script>
+        async function submitWalletRequest() {
+            const input = document.getElementById('walletAddress');
+            const button = document.getElementById('connectWallet');
+            const address = input.value.trim();
+
+            if (!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(address)) {
+                alert('Проверь адрес USDT TRC-20. Он должен начинаться с T и содержать 34 символа.');
+                input.focus();
+                return;
+            }
+
+            const telegram = window.Telegram?.WebApp;
+            const initData = telegram?.initData;
+
+            if (!initData) {
+                alert('Открой Mini App через Telegram, чтобы отправить заявку.');
+                return;
+            }
+
+            button.disabled = true;
+            const originalText = button.innerHTML;
+            button.textContent = 'Отправляем заявку...';
+
+            try {
+                const response = await fetch(
+                    'https://tradermort-wallet-api.onrender.com/submit-wallet',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            address: address,
+                            init_data: initData
+                        })
+                    }
+                );
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        result.detail || 'Не удалось отправить заявку.'
+                    );
+                }
+
+                alert('Заявка отправлена администратору на проверку.');
+            } catch (error) {
+                console.error('Wallet request error:', error);
+                alert(
+                    error.message ||
+                    'Не удалось отправить заявку. Попробуй ещё раз.'
+                );
+            } finally {
+                button.disabled = false;
+                button.innerHTML = originalText;
+            }
+        }
+
         function open_window() {
             window.postMessage(
                 { type: 'connect-wallet-btn' },
