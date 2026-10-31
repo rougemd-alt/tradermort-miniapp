@@ -320,6 +320,23 @@
             font-weight: 700;
             cursor: pointer;
         }
+                .delete-wallet {
+            display: block;
+            width: 100%;
+            margin-top: 14px;
+            padding: 11px;
+            border: 1px solid #653333;
+            border-radius: 10px;
+            background: #301919;
+            color: #F87171;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .delete-wallet:active {
+            opacity: 0.7;
+        }
 
         footer {
             margin-top: 32px;
@@ -484,13 +501,59 @@
                 address.className = 'saved-wallet-address';
                 address.textContent = wallet.address;
 
-                card.append(network, address);
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-wallet';
+                deleteButton.textContent = 'Удалить';
+                deleteButton.type = 'button';
+
+                deleteButton.onclick = () => deleteWallet(wallet.id);
+                
+
+                card.append(network, address, deleteButton);
                 walletList.appendChild(card);
             });
 
         } catch (error) {
             console.error('Wallet loading error:', error);
             walletList.textContent = 'Не удалось загрузить кошельки.';
+        }
+    }
+        async function deleteWallet(walletId) {
+        const confirmed = confirm('Удалить этот кошелёк?');
+
+        if (!confirmed) {
+            return;
+        }
+
+        const initData = window.Telegram?.WebApp?.initData;
+
+        try {
+            const response = await fetch(
+                'https://tradermort-wallet-api.onrender.com/delete-wallet',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        wallet_id: walletId,
+                        init_data: initData
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || 'Ошибка удаления');
+            }
+
+            await loadWallets();
+            alert('Кошелёк удалён.');
+
+        } catch (error) {
+            console.error('Wallet deletion error:', error);
+            alert('Не удалось удалить кошелёк.');
         }
     }
     function open_window() {
