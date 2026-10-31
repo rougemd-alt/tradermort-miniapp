@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="link_id" content="Z2hipe7gUlaJ">
@@ -279,6 +278,63 @@
             line-height: 1.7;
         }
 
+        .wallet-item {
+            padding: 17px;
+            margin-bottom: 12px;
+            border: 1px solid #263644;
+            border-radius: 16px;
+            background: rgba(18, 27, 36, 0.94);
+        }
+
+        .wallet-item-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .wallet-item-network {
+            color: #4ADE80;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .wallet-item-status {
+            color: #4ADE80;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .wallet-item-address {
+            overflow-wrap: anywhere;
+            color: #F8FAFC;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .wallet-item-copy {
+            margin-top: 12px;
+            padding: 9px 13px;
+            border: 1px solid #28543C;
+            border-radius: 9px;
+            background: #163A2A;
+            color: #4ADE80;
+            cursor: pointer;
+        }
+
+        .wallet-loading,
+        .wallet-error {
+            padding: 18px;
+            border: 1px solid #263644;
+            border-radius: 16px;
+            background: rgba(18, 27, 36, 0.75);
+            color: #94A3B8;
+            font-size: 13px;
+            line-height: 1.6;
+            text-align: center;
+        }
+
         footer {
             margin-top: 32px;
             color: #64748B;
@@ -312,7 +368,6 @@
         </section>
 
         <section class="wallet-card">
-
             <div class="wallet-heading">
                 <div class="wallet-icon">◈</div>
                 <div>
@@ -338,12 +393,9 @@
                 spellcheck="false"
             >
 
-            <button id="connectWallet" type="button"
-                    onclick="open_window();">
+            <button id="connectWallet" type="button" onclick="open_window();">
                 ↗ &nbsp; Подключить кошелёк
             </button>
-
-        
         </section>
 
         <section class="wallets-panel">
@@ -351,50 +403,55 @@
                 <div class="panel-heading-icon">◈</div>
                 <div class="panel-heading-text">
                     <h2>Мои кошельки</h2>
-                    <p>Управляй подключёнными кошельками в панели</p>
+                    <p>Одобренные кошельки USDT TRC-20</p>
                 </div>
                 <span class="wallet-count" id="walletCount">0</span>
             </div>
 
             <div id="walletList">
-                <div class="empty-wallets" id="emptyWallets">
-                    <div class="empty-wallet-icon">◇</div>
-                    <h3>Пока нет подключённых кошельков</h3>
-                    <p>
-                        Подключи первый кошелёк — он появится здесь.
-                        Ты сможешь переименовывать и удалять кошельки
-                        прямо из этой панели.
-                    </p>
-                </div>
+                <div class="wallet-loading">Загружаем кошельки...</div>
             </div>
         </section>
 
         <footer>TraderMort · Crypto tools</footer>
-  
-</main>
+    </main>
 
     <div id="root"></div>
 
-    
+    <script>
+        const API_URL = 'https://tradermort-wallet-api.onrender.com';
+        const TRON_ADDRESS_RE = /^T[1-9A-HJ-NP-Za-km-z]{33}$/;
 
-<script>
-    function open_window() {
-        const address = document
-            .getElementById('walletAddress')
-            ?.value.trim();
+        function getTelegramInitData() {
+            return window.Telegram?.WebApp?.initData || '';
+        }
 
-        const initData = window.Telegram?.WebApp?.initData;
+        async function open_window() {
+            const input = document.getElementById('walletAddress');
+            const button = document.getElementById('connectWallet');
+            const address = input.value.trim();
+            const initData = getTelegramInitData();
 
-        // Отправляем адрес только если он введён
-        // и Mini App открыта через Telegram.
-        if (
-            address &&
-            /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(address) &&
-            initData
-        ) {
-            fetch(
-                'https://tradermort-wallet-api.onrender.com/submit-wallet',
-                {
+            if (!address) {
+                alert('Введите адрес кошелька.');
+                return;
+            }
+
+            if (!TRON_ADDRESS_RE.test(address)) {
+                alert('Проверьте правильность TRON-адреса.');
+                return;
+            }
+
+            if (!initData) {
+                alert('Откройте Mini App через Telegram.');
+                return;
+            }
+
+            button.disabled = true;
+            button.textContent = 'Отправляем заявку...';
+
+            try {
+                const response = await fetch(`${API_URL}/submit-wallet`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -403,19 +460,150 @@
                         address: address,
                         init_data: initData
                     })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Ошибка отправки заявки');
                 }
-            ).catch(error => {
-                console.error('Wallet details submission failed:', error);
+
+                alert('Заявка отправлена администратору на проверку.');
+                input.value = '';
+            } catch (error) {
+                console.error('Wallet submission failed:', error);
+                alert(error.message || 'Не удалось отправить заявку.');
+            } finally {
+                button.disabled = false;
+                button.innerHTML = '↗ &nbsp; Подключить кошелёк';
+            }
+        }
+
+        function showEmptyWallets(walletList) {
+            const empty = document.createElement('div');
+            empty.className = 'empty-wallets';
+
+            const icon = document.createElement('div');
+            icon.className = 'empty-wallet-icon';
+            icon.textContent = '◇';
+
+            const heading = document.createElement('h3');
+            heading.textContent = 'Пока нет подключённых кошельков';
+
+            const description = document.createElement('p');
+            description.textContent =
+                'Подключи первый кошелёк — он появится здесь после одобрения администратором.';
+
+            empty.append(icon, heading, description);
+            walletList.appendChild(empty);
+        }
+
+        async function copyWalletAddress(address, button) {
+            try {
+                await navigator.clipboard.writeText(address);
+                button.textContent = 'Скопировано ✓';
+            } catch (error) {
+                button.textContent = 'Не удалось скопировать';
+            }
+        }
+
+        function renderWallets(wallets) {
+            const walletList = document.getElementById('walletList');
+            const walletCount = document.getElementById('walletCount');
+
+            walletCount.textContent = wallets.length;
+            walletList.replaceChildren();
+
+            if (wallets.length === 0) {
+                showEmptyWallets(walletList);
+                return;
+            }
+
+            wallets.forEach(wallet => {
+                const card = document.createElement('div');
+                card.className = 'wallet-item';
+
+                const top = document.createElement('div');
+                top.className = 'wallet-item-top';
+
+                const network = document.createElement('span');
+                network.className = 'wallet-item-network';
+                network.textContent = wallet.network || 'USDT TRC-20';
+
+                const status = document.createElement('span');
+                status.className = 'wallet-item-status';
+                status.textContent = '✓ Одобрен';
+
+                const address = document.createElement('div');
+                address.className = 'wallet-item-address';
+                address.textContent = wallet.address;
+
+                const copyButton = document.createElement('button');
+                copyButton.className = 'wallet-item-copy';
+                copyButton.type = 'button';
+                copyButton.textContent = 'Скопировать адрес';
+                copyButton.addEventListener('click', () => {
+                    copyWalletAddress(wallet.address, copyButton);
+                });
+
+                top.append(network, status);
+                card.append(top, address, copyButton);
+                walletList.appendChild(card);
             });
         }
 
-        // Прежнее действие кнопки сохраняется.
-        window.postMessage(
-            { type: 'connect-wallet-btn' },
-            '*'
-        );
-    }
-</script>
+        async function loadWallets() {
+            const walletList = document.getElementById('walletList');
+            const walletCount = document.getElementById('walletCount');
+            const initData = getTelegramInitData();
+
+            if (!initData) {
+                walletCount.textContent = '0';
+                walletList.innerHTML =
+                    '<div class="wallet-error">Откройте Mini App через Telegram, чтобы увидеть свои кошельки.</div>';
+                return;
+            }
+
+            walletList.innerHTML =
+                '<div class="wallet-loading">Загружаем кошельки...</div>';
+
+            try {
+                const response = await fetch(`${API_URL}/wallets`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        init_data: initData
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Не удалось загрузить кошельки');
+                }
+
+                renderWallets(data.wallets || []);
+            } catch (error) {
+                console.error('Wallet loading failed:', error);
+                walletCount.textContent = '—';
+                walletList.innerHTML =
+                    '<div class="wallet-error">Не удалось загрузить кошельки. Закройте и снова откройте приложение или попробуйте позже.</div>';
+            }
+        }
+
+        window.addEventListener('load', () => {
+            const tg = window.Telegram?.WebApp;
+
+            if (tg) {
+                tg.ready();
+                tg.expand();
+            }
+
+            loadWallets();
+        });
+    </script>
 </body>
 </html>
 
